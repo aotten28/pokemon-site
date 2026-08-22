@@ -1,5 +1,7 @@
 # dependencies
 /node_modules
+/.bun
+/.bun-cache
 /.pnpm-store
 /.pnp
 .pnp.*
