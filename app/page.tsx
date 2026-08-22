@@ -103,7 +103,7 @@ export default function Home() {
         <nav aria-label="Primary navigation">
           <a className="active" href="#pokedex">Pokédex</a>
           <button className={showFavorites ? 'nav-favorite active' : 'nav-favorite'} onClick={() => setShowFavorites(!showFavorites)}>
-            <span aria-hidden="true">♥</span> Favorites <b>{favorites.length}</b>
+            <span className="love-ball small" aria-hidden="true"><i>♥</i></span> Favorites <b>{favorites.length}</b>
           </button>
         </nav>
       </header>
@@ -167,7 +167,7 @@ export default function Home() {
           <div className="card-grid">
             {filtered.map((item) => (
               <article className="pokemon-card" key={item.id} style={{ '--type-color': TYPE_COLORS[item.types[0]] } as React.CSSProperties}>
-                <button className={favorites.includes(item.id) ? 'heart saved' : 'heart'} onClick={() => toggleFavorite(item.id)} aria-label={`${favorites.includes(item.id) ? 'Remove' : 'Add'} ${titleCase(item.name)} ${favorites.includes(item.id) ? 'from' : 'to'} favorites`}>♥</button>
+                <button className={favorites.includes(item.id) ? 'heart saved' : 'heart'} onClick={() => toggleFavorite(item.id)} aria-label={`${favorites.includes(item.id) ? 'Remove' : 'Add'} ${titleCase(item.name)} ${favorites.includes(item.id) ? 'from' : 'to'} favorites`}><span className="love-ball mini" aria-hidden="true"><i>♥</i></span></button>
                 <button className="card-main" onClick={() => setSelected(item)} aria-label={`View ${titleCase(item.name)} details`}>
                   <span className="card-id">{padId(item.id)}</span>
                   <div className="image-well"><span>{String(item.id).padStart(3, '0')}</span><img src={item.image} alt="" loading="lazy" /></div>
@@ -197,7 +197,7 @@ export default function Home() {
               <div className="measurements"><div><span>Height</span><strong>{selected.height / 10} m</strong></div><div><span>Weight</span><strong>{selected.weight / 10} kg</strong></div><div><span>Abilities</span><strong>{selected.abilities.map(titleCase).join(', ')}</strong></div></div>
               <h3>Base stats</h3>
               <div className="stats">{selected.stats.map((stat) => <div key={stat.name}><span>{titleCase(stat.name)}</span><div><i style={{ width: `${Math.min(100, (stat.value / 160) * 100)}%` }} /></div><b>{stat.value}</b></div>)}</div>
-              <button className={favorites.includes(selected.id) ? 'favorite-button saved' : 'favorite-button'} onClick={() => toggleFavorite(selected.id)}>♥ {favorites.includes(selected.id) ? 'Saved to favorites' : 'Add to favorites'}</button>
+              <button className={favorites.includes(selected.id) ? 'favorite-button saved' : 'favorite-button'} onClick={() => toggleFavorite(selected.id)}><span className="love-ball small" aria-hidden="true"><i>♥</i></span>{favorites.includes(selected.id) ? 'Saved to favorites' : 'Add to favorites'}</button>
             </div>
           </section>
         </div>

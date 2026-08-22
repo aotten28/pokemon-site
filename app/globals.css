@@ -17,8 +17,14 @@ nav { display: flex; align-items: center; gap: 30px; font-size: 14px; font-weigh
 nav a { position: relative; padding: 27px 0; }
 nav a.active:after { content: ''; position: absolute; bottom: 17px; left: 0; right: 0; height: 2px; border-radius: 4px; background: var(--green); }
 .nav-favorite { border: 0; background: transparent; cursor: pointer; color: var(--ink); font-weight: 700; }
-.nav-favorite > span { color: #e9a5a2; font-size: 16px; margin-right: 3px; }
-.nav-favorite.active > span { color: #dc514b; }
+.nav-favorite { display: inline-flex; align-items: center; gap: 7px; }
+.love-ball { --ball-size: 24px; width: var(--ball-size); height: var(--ball-size); flex: 0 0 var(--ball-size); display: inline-grid; place-items: center; position: relative; overflow: hidden; border-radius: 50%; border: 2px solid #673c50; background: linear-gradient(#f48bab 0 44%, #673c50 44% 56%, #fff8f8 56%); box-shadow: inset 0 -2px 4px rgba(103,60,80,.14), 0 2px 5px rgba(75,42,57,.12); transform: rotate(-8deg); }
+.love-ball:before,.love-ball:after { content: ''; position: absolute; top: 2px; width: 5px; height: 5px; border-radius: 50%; background: #ffeaf0; opacity: .9; }
+.love-ball:before { left: 3px; }.love-ball:after { right: 3px; }
+.love-ball i { z-index: 1; display: grid; place-items: center; width: calc(var(--ball-size) * .42); height: calc(var(--ball-size) * .42); border-radius: 50%; background: #fff; border: 1.5px solid #673c50; color: #ec668f; font: normal 700 calc(var(--ball-size) * .31)/1 Arial,sans-serif; transform: rotate(8deg); }
+.love-ball.small { --ball-size: 22px; }
+.love-ball.mini { --ball-size: 25px; transition: transform .2s, filter .2s; }
+.nav-favorite.active .love-ball,.saved .love-ball { filter: saturate(1.22); box-shadow: 0 0 0 3px rgba(244,139,171,.2), inset 0 -2px 4px rgba(103,60,80,.14); }
 .nav-favorite b { display: inline-grid; place-items: center; min-width: 19px; height: 19px; padding: 0 5px; margin-left: 4px; border-radius: 50%; background: #e7e8df; font-size: 10px; }
 .hero { position: relative; overflow: hidden; background: var(--paper); }
 .hero-grid { min-height: 576px; max-width: 1380px; margin: 0 auto; padding: 64px clamp(22px, 7vw, 100px) 40px; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 40px; }
@@ -70,8 +76,8 @@ nav a.active:after { content: ''; position: absolute; bottom: 17px; left: 0; rig
 .pokemon-card:hover { transform: translateY(-4px); box-shadow: 0 18px 45px rgba(31,46,39,.1); }
 .pokemon-card:hover:before { transform: scaleX(1); }
 .card-main { display: block; text-align: left; width: 100%; height: 100%; padding: 18px; border: 0; background: transparent; cursor: pointer; color: inherit; }
-.heart { position: absolute; right: 14px; top: 12px; border: 0; background: transparent; color: #d9dcd6; font-size: 18px; cursor: pointer; z-index: 2; transition: .2s; }
-.heart:hover, .heart.saved { color: #dc5d56; transform: scale(1.12); }
+.heart { position: absolute; right: 11px; top: 10px; border: 0; background: transparent; padding: 3px; cursor: pointer; z-index: 2; }
+.heart:hover .love-ball,.heart.saved .love-ball { transform: rotate(-8deg) scale(1.12); }
 .card-id { font: 700 9px/1 Arial,sans-serif; letter-spacing: 1.4px; color: #89938e; }
 .image-well { height: 170px; display: grid; place-items: center; position: relative; margin: 4px 0; }
 .image-well span { position: absolute; font: bold 70px/1 Georgia,serif; color: #f0f1ec; letter-spacing: -6px; }
@@ -108,7 +114,7 @@ footer .brand { font-size: 16px; color: white; } footer .brand > span:last-child
 .measurements div { display: grid; gap: 5px; }.measurements span { text-transform: uppercase; font-size: 8px; letter-spacing: 1px; color: #8b958f; }.measurements strong { font-size: 11px; font-weight: 700; }
 .detail-copy h3 { font: 400 19px Georgia,serif; margin: 0 0 14px; }
 .stats { display: grid; gap: 9px; }.stats > div { display: grid; grid-template-columns: 75px 1fr 28px; gap: 10px; align-items: center; }.stats span { text-transform: uppercase; font-size: 8px; letter-spacing: .6px; color: #69766f; }.stats > div > div { height: 5px; background: #e5e7e0; border-radius: 5px; overflow: hidden; }.stats i { display: block; height: 100%; background: var(--type-color); border-radius: inherit; }.stats b { font-size: 9px; }
-.favorite-button { width: 100%; margin-top: 27px; padding: 13px; border-radius: 5px; border: 1px solid #d8dbd3; background: transparent; cursor: pointer; color: #42564b; font-size: 11px; font-weight: 800; }.favorite-button:hover,.favorite-button.saved { background: #fbe7e5; border-color: #efb8b4; color: #b9413c; }
+.favorite-button { width: 100%; margin-top: 27px; padding: 10px 13px; border-radius: 5px; border: 1px solid #d8dbd3; background: transparent; cursor: pointer; color: #42564b; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 9px; }.favorite-button:hover,.favorite-button.saved { background: #fbe7e5; border-color: #efb8b4; color: #b9413c; }
 @media (max-width: 1000px) { .card-grid { grid-template-columns: repeat(3,1fr); }.hero-grid { grid-template-columns: 1.08fr .92fr; }.hero-art img { width: 40vw; }.feature-chip { display: none; } }
 @media (max-width: 760px) { nav a { display: none; }.topbar { height: 64px; }.hero-grid { grid-template-columns: 1fr; padding-top: 52px; text-align: center; }.hero-copy { margin: auto; }.eyebrow,.hero-actions { justify-content: center; }.hero h1 { font-size: clamp(50px,15vw,72px); letter-spacing: -3px; }.hero-art { min-height: 350px; }.hero-art img { width: min(85vw,390px); height: 340px; }.hero-art:before { width: min(85vw,380px); }.section-heading { display: block; }.section-heading > p { margin-top: 16px; }.card-grid { grid-template-columns: repeat(2,1fr); }.detail-modal { grid-template-columns: 1fr; }.detail-visual { min-height: 280px; }.detail-visual img { height: 270px; }.detail-copy { padding: 36px 26px 30px; } footer { grid-template-columns: 1fr auto; } footer p { display: none; } }
 @media (max-width: 480px) { .hero-grid { padding-bottom: 24px; }.hero-art { min-height: 310px; }.hero-art img { height: 300px; }.dex-section { padding-top: 62px; }.card-grid { gap: 10px; }.card-main { padding: 13px; }.pokemon-card h3 { font-size: 20px; }.image-well { height: 130px; }.image-well img { width: 118px; height: 118px; }.image-well span { font-size: 53px; }.view-details { display: none; }.pokemon-card { min-height: 240px; }.search-box kbd { display: none; }.detail-copy h2 { font-size: 40px; }.measurements { grid-template-columns: 1fr 1fr; }.measurements div:last-child { grid-column: 1 / -1; }.hero-actions { gap: 16px; } }
