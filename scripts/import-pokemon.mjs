@@ -43,14 +43,14 @@ function mapPokemon(data) {
   };
 }
 
-async function fetchInParallel(items) {
+async function fetchInParallel(items, mapper = (data) => data) {
   const rows = [];
   let cursor = 0;
 
   async function worker() {
     while (cursor < items.length) {
       const index = cursor++;
-      rows[index] = mapPokemon(await fetchJson(items[index].url));
+      rows[index] = mapper(await fetchJson(items[index].url));
     }
   }
 
@@ -60,13 +60,45 @@ async function fetchInParallel(items) {
 
 const species = await fetchJson(`${POKE_API}/pokemon-species?limit=1`);
 const index = await fetchJson(`${POKE_API}/pokemon?limit=${species.count}`);
-const pokemon = await fetchInParallel(index.results);
+const basePokemon = await fetchInParallel(index.results, mapPokemon);
+const formIndex = await fetchJson(`${POKE_API}/pokemon-form?limit=100000`);
+const pokemonForms = await fetchInParallel(formIndex.results);
+const megaFormDetails = pokemonForms.filter((form) => form.is_mega);
+const megaFormPokemon = await fetchInParallel(megaFormDetails.map((form) => form.pokemon));
+const megaFormsBySpecies = new Map();
+
+function resourceId(url) {
+  return Number(url.split('/').filter(Boolean).at(-1));
+}
+
+function formatMegaLabel(name, speciesName) {
+  const suffix = name.startsWith(`${speciesName}-`) ? name.slice(speciesName.length + 1) : name;
+  return suffix.split('-').map((part) => part === 'x' || part === 'y' ? part.toUpperCase() : `${part[0].toUpperCase()}${part.slice(1)}`).join(' ');
+}
+
+for (let index = 0; index < megaFormDetails.length; index += 1) {
+  const mega = megaFormPokemon[index];
+  const speciesId = resourceId(mega.species.url);
+  const artwork = mega.sprites.other['official-artwork'];
+  const megaForm = {
+    name: mega.name,
+    label: formatMegaLabel(mega.name, mega.species.name),
+    types: mega.types.map((item) => item.type.name),
+    image: artwork.front_default ?? mega.sprites.front_default,
+    shinyImage: artwork.front_shiny ?? mega.sprites.front_shiny ?? artwork.front_default ?? mega.sprites.front_default,
+  };
+  const current = megaFormsBySpecies.get(speciesId) ?? [];
+  current.push(megaForm);
+  megaFormsBySpecies.set(speciesId, current);
+}
+
+const pokemon = basePokemon.map((item) => ({ ...item, mega_forms: megaFormsBySpecies.get(item.id) ?? [] }));
 
 for (let offset = 0; offset < pokemon.length; offset += BATCH_SIZE) {
   const batch = pokemon.slice(offset, offset + BATCH_SIZE);
   await sql`
-    insert into public.pokemon (id, name, height, weight, types, abilities, image_url, stats, updated_at)
-    select id, name, height, weight, types, abilities, image_url, stats, updated_at
+    insert into public.pokemon (id, name, height, weight, types, abilities, image_url, stats, mega_forms, updated_at)
+    select id, name, height, weight, types, abilities, image_url, stats, mega_forms, updated_at
     from jsonb_to_recordset(${sql.json(batch)}) as item(
       id integer,
       name text,
@@ -76,6 +108,7 @@ for (let offset = 0; offset < pokemon.length; offset += BATCH_SIZE) {
       abilities text[],
       image_url text,
       stats jsonb,
+      mega_forms jsonb,
       updated_at timestamptz
     )
     on conflict (id) do update set
@@ -86,6 +119,7 @@ for (let offset = 0; offset < pokemon.length; offset += BATCH_SIZE) {
       abilities = excluded.abilities,
       image_url = excluded.image_url,
       stats = excluded.stats,
+      mega_forms = excluded.mega_forms,
       updated_at = excluded.updated_at
   `;
   console.log(`Imported ${Math.min(offset + batch.length, pokemon.length)} of ${pokemon.length}`);
